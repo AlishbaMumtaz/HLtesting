@@ -18,10 +18,16 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Set up Java 11 ☕
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.6'  # or whichever version you are using
+          flutter-version: '3.19.6'  # or your version
 
       - name: Install dependencies
         run: flutter pub get
@@ -31,7 +37,7 @@ jobs:
         run: flutter build apk --release
         working-directory: HeartLens
 
-      - name: Run SonarQube Scan
+      - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v5
         with:
           projectBaseDir: HeartLens
