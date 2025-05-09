@@ -1,22 +1,41 @@
-name: Build
+name: Build and Analyze Flutter Project
+
 on:
   push:
     branches:
-      - main
+      - main  # Change to your default branch name if necessary
   pull_request:
     types: [opened, synchronize, reopened]
+
 jobs:
   sonarqube:
     name: SonarQube
-    runs-on: windows-latest
+    runs-on: windows-latest  # or macos-latest, ubuntu-latest, depending on your setup
+
     steps:
-      - uses: actions/checkout@v4
+      # Step 1: Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      # The analysis requires to retrieve dependencies and build successfully
-      - name: Build APK
-        run:  flutter build apk --release
+          fetch-depth: 0  # To ensure we get the full history for analysis
+
+      # Step 2: Set up Flutter SDK (if you're working on a Flutter project)
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.0.0'  # Use the version of Flutter you need
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: flutter pub get  # Fetches the dependencies specified in pubspec.yaml
+
+      # Step 4: Build the Flutter project (APK for Android in this case)
+      - name: Build Flutter APK
+        run: flutter build apk --release  # You can change this to ios, web, etc., as needed
+
+      # Step 5: Run SonarQube analysis
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v5
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # Add your SonarQube token as a GitHub secret
+
