@@ -1,41 +1,39 @@
-name: Build and Analyze Flutter Project
+name: Build
 
 on:
   push:
     branches:
-      - main  # Change to your default branch name if necessary
+      - main
   pull_request:
     types: [opened, synchronize, reopened]
 
 jobs:
   sonarqube:
     name: SonarQube
-    runs-on: windows-latest  # or macos-latest, ubuntu-latest, depending on your setup
+    runs-on: windows-latest
 
     steps:
-      # Step 1: Checkout the repository
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # To ensure we get the full history for analysis
+          fetch-depth: 0
 
-      # Step 2: Set up Flutter SDK (if you're working on a Flutter project)
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.0.0'  # Use the version of Flutter you need
+          flutter-version: '3.19.6'  # or whichever version you are using
 
-      # Step 3: Install dependencies
       - name: Install dependencies
-        run: flutter pub get  # Fetches the dependencies specified in pubspec.yaml
+        run: flutter pub get
+        working-directory: HeartLens
 
-      # Step 4: Build the Flutter project (APK for Android in this case)
       - name: Build Flutter APK
-        run: flutter build apk --release  # You can change this to ios, web, etc., as needed
+        run: flutter build apk --release
+        working-directory: HeartLens
 
-      # Step 5: Run SonarQube analysis
-      - name: SonarQube Scan
+      - name: Run SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v5
+        with:
+          projectBaseDir: HeartLens
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # Add your SonarQube token as a GitHub secret
-
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
